@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Checkers — Play against the computer</title>
+  <meta name="description" content="Play American checkers (English draughts) against the computer, with three difficulty levels.">
+  <meta name="theme-color" content="#2b1a0e">
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="config.js"></script>
+  <script>
+    // Google Analytics: only when config.js provides GTM_ID.
+    (function () {
+      var id = (typeof GTM_ID !== 'undefined' && GTM_ID) ? String(GTM_ID).trim() : '';
+      if (!/^(G|GTM)-[A-Z0-9]+$/i.test(id)) return;
+      window.dataLayer = window.dataLayer || [];
+      var s = document.createElement('script');
+      s.async = true;
+      if (/^GTM-/i.test(id)) {
+        window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        s.src = 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(id);
+      } else {
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        window.gtag('js', new Date());
+        window.gtag('config', id);
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(id);
+      }
+      document.head.appendChild(s);
+    })();
+  </script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="masthead">
+      <h1 data-i18n="title">Checkers</h1>
+      <p class="subtitle" data-i18n="subtitle">American Checkers</p>
+    </header>
+
+    <main class="layout">
+      <section class="table" aria-label="board">
+        <div class="player-bar" id="bar-top">
+          <span class="chip" id="chip-top"></span>
+          <span class="name" data-i18n="cpu">Computer</span>
+          <span class="count" id="count-top"></span>
+        </div>
+
+        <div class="frame">
+          <div class="board" id="board" role="grid"></div>
+        </div>
+
+        <div class="player-bar" id="bar-bottom">
+          <span class="chip" id="chip-bottom"></span>
+          <span class="name" data-i18n="you">You</span>
+          <span class="count" id="count-bottom"></span>
+        </div>
+
+        <p class="status" id="status" aria-live="polite"></p>
+      </section>
+
+      <aside class="panel">
+        <div class="field">
+          <span class="label" data-i18n="level">Difficulty</span>
+          <div class="seg" id="level" role="radiogroup">
+            <button type="button" data-value="easy" data-i18n="easy">Easy</button>
+            <button type="button" data-value="medium" data-i18n="medium">Medium</button>
+            <button type="button" data-value="hard" data-i18n="hard">Hard</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label" data-i18n="yourColor">You play</span>
+          <div class="seg" id="color" role="radiogroup">
+            <button type="button" data-value="1" data-i18n="blackFirst">Black (first)</button>
+            <button type="button" data-value="-1" data-i18n="whiteSecond">White (second)</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-new" data-i18n="newGame">New game</button>
+          <button type="button" class="btn" id="btn-undo" data-i18n="undo">Undo</button>
+          <button type="button" class="btn icon" id="btn-sound" aria-pressed="true" data-i18n-aria="sound" aria-label="Sound">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="mute" d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="field moves-field">
+          <span class="label" data-i18n="moves">Moves</span>
+          <ol class="moves" id="moves"></ol>
+        </div>
+
+        <details class="rules">
+          <summary data-i18n="rules">Rules</summary>
+          <p data-i18n="rulesText"></p>
+        </details>
+      </aside>
+    </main>
+  </div>
+
+  <dialog id="result-dialog" class="result">
+    <form method="dialog">
+      <h2 id="result-title"></h2>
+      <p id="result-reason"></p>
+      <div class="actions">
+        <button class="btn" value="close" data-i18n="close">Close</button>
+        <button class="btn primary" value="again" id="btn-again" data-i18n="playAgain">Play again</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

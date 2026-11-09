@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Test
+        run: node --test 'tests/*.test.mjs'
+
+      - name: Assemble site
+        env:
+          GTM_ID: ${{ vars.GTM_ID }}
+        run: |
+          mkdir -p _site
+          cp -r index.html config.js favicon.ico apple-touch-icon.png css js _site/
+          if [ -n "$GTM_ID" ]; then
+            if ! printf '%s' "$GTM_ID" | grep -Eq '^(G|GTM)-[A-Za-z0-9]+$'; then
+              echo "::error::vars.GTM_ID has an unexpected format: $GTM_ID"
+              exit 1
+            fi
+            printf "const GTM_ID = '%s';\n" "$GTM_ID" > _site/config.js
+            echo "Google Analytics tag enabled ($GTM_ID)"
+          else
+            echo "vars.GTM_ID is not set; using config.js from the repository"
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
